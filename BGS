@@ -1,0 +1,195 @@
+# -*- coding: utf-8 -*-
+
+def check_players(num):
+	try:
+		num = int(num)
+	except(TypeError, ValueError):
+		print u"Данные были введены некорректно"
+		print u"Какое количество игроков(Максимум 5): "
+		return check_players(raw_input())
+	num = int(num)
+	if num < 1 or num > 5:
+		print u"Количество игроков было введено некорректно. Игроков максимум может быть 5"
+		print u"Какое количество игроков(Максимум 5): "
+		return check_players(raw_input())
+	else:
+		return num
+				
+def check_throw(throw):
+	try:
+		throw = int(throw)
+	except(TypeError, ValueError):
+		print u"Данные были введены некорректно"
+		print u"Бросьте шар(введите число от 0 до 10):"
+		return check_throw(raw_input())
+	throw = int(throw)
+	if throw > 10 or throw < 0:
+		print u"Вы не могли сбить столько кеглей."
+		print u"Бросьте шар(введите число от 0 до 10):"
+		return check_throw(raw_input())
+	else:
+		return throw
+			 
+def throw_two(throw):
+	left = 10 - throw
+	print u"Осталось кеглей: ", str(left)
+	total = throw
+	print u'Бросьте шар ещё раз(Введите число от 0 до ' + str(left)+' ): '
+	throw = raw_input()
+	try:
+		throw = int(throw)
+	except(TypeError, ValueError):
+		print u"Данные были введены некорректно"
+		return throw_two(total)
+	if throw > left or throw < 0:
+		print u"Вы не могли сбить столько кеглей."
+		return throw_two(total)
+	else:
+		total = total+throw
+		print u"Всего сбито:", str(total)
+		return total
+
+	print u"Всего сбито: ", str(total)
+	return total
+
+def happening(throw):
+	if throw < 10:
+		throw = throw_two(throw)
+		if throw < 10:
+			return throw
+		else:
+			return "/"
+	else:
+		return "X"
+		
+def happening_2(count_point):
+	n = len(count_point)-1
+	if count_point[n] == "X":
+		while True:
+			print u'Бросьте шар ещё раз(Введите число от 0 до ' + str(left)+' ): '
+			throw = raw_input()
+			try:
+				throw = int(throw)
+				break
+			except(TypeError, ValueError):
+				print u"Данные были введены некорректно"
+		throw = int(throw)
+		if count_point[n-1] == "X":
+			count_point[n-1] = 20 + throw
+		count_point[n] = 10 + throw 
+		if throw == 10:
+			print u"Бросьте шар ещё раз(введите число от 0 до 10): "
+			throw = input()
+			count_point[n] += throw
+		else:
+			throw = throw_two(throw)
+			count_point[n] = 10 + throw
+
+	elif count_point[n] == "/":
+		while True:
+			print u'Бросьте шар ещё раз(Введите число от 0 до ' + str(left)+' ): '
+			throw = raw_input()
+			try:
+				throw = int(throw)
+				break
+			except(TypeError, ValueError):
+				print u"Данные были введены некорректно"
+		throw = int(throw)
+		count_point[n] = 10 +throw 
+	return count_point			
+
+def sample_throw(count_point):
+	print u"Бросьте шар(введите число от 0 до 10):"
+	throw = check_throw(raw_input())
+	count_point.append(happening(throw))
+	return count_point		
+
+def doubel_throw(count_point):
+	n = len(count_point) - 1
+	print u"Бросьте шар(введите число от 0 до 10):"
+	throw = check_throw(input())
+	count_point[n] = 10 + throw
+	count_point.append(happening(throw))
+	return count_point
+
+def triple_throw(count_point):
+	n = len(count_point) - 1
+	print u"Бросьте шар(введите число от 0 до 10):"
+	throw = check_throw(raw_input())
+	if count_point[n-1] == "X":
+		count_point[n-1] = 20 + throw
+	if throw < 10:
+		throw = throw_two(throw)
+		count_point[n] = 10 + throw
+		if throw < 10:
+			count_point.append(throw)
+			return count_point
+		else:
+			count_point.append("/")
+			return count_point
+	else:
+		count_point.append("X")
+		return count_point
+  	
+print u"Вас приветствует программа по подсчету очков в боулинге"
+
+statistic = {}
+
+print u'Какое количество игроков(Максимум 5): '
+count_player = check_players(raw_input())
+
+for i in range(count_player):
+	print u"Имя игрока № " + str(i+1) + ": "
+	name = raw_input()
+	statistic[name] = []
+	
+for i in range(9):
+	for key in statistic:
+		print key,u"ваша очередь бросать шар."
+		count_point = statistic[key]
+		n = len(count_point)-1
+		if len(count_point) == 0:
+			count_point = sample_throw(count_point)
+			print key+":", statistic[key]
+		else:
+			if count_point[n] == "/":
+				count_point = doubel_throw(count_point)
+			elif count_point[n] == "X":
+				count_point = triple_throw(count_point)
+			else:
+				count_point = sample_throw(count_point)
+			statistic[key] = count_point
+			print key+":", statistic[key]
+			
+n = len(count_point)-1
+
+for key in statistic:
+	print key,u"ваша очередь бросать шар."
+	count_point = statistic[key]
+	n = len(count_point)-1
+	if count_point[n] == "/":
+		count_point = doubel_throw(count_point)
+		count_point = happening_2(count_point)
+	elif count_point[n] == "X":
+		count_point = triple_throw(count_point)
+		count_point = happening_2(count_point)
+	else:
+		count_point = sample_throw(count_point)
+		count_point = happening_2(count_point)
+	statistic[key] = count_point
+	print key+":", statistic[key]
+
+sum_resuld = []
+	
+for key in statistic:
+	total = sum(statistic[key])
+	sum_resuld.append(total)
+	print key+":", statistic[key] , "Total: ", total
+	
+winner = max(sum_resuld)
+
+for key in statistic:
+	if sum(statistic[key]) == winner:
+		print key, "Win"
+		 	
+input()
