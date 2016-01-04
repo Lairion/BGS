@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 
+def check_name(name):
+	if len(name) > 0:
+		return name
+	else:
+		print "Имя введенно не коректно. Повторите ввод имени."
+		return check_name(raw_input())
+		
 def check_players(num):
 	try:
 		num = int(num)
 	except(TypeError, ValueError):
-		print u"Данные были введены некорректно"
+		print u"Данные были введены некорректно."
 		print u"Какое количество игроков(Максимум 5): "
 		return check_players(raw_input())
-	num = int(num)
+	
 	if num < 1 or num > 5:
 		print u"Количество игроков было введено некорректно. Игроков максимум может быть 5"
 		print u"Какое количество игроков(Максимум 5): "
@@ -22,22 +29,27 @@ def check_throw(throw):
 		print u"Данные были введены некорректно"
 		print u"Бросьте шар(введите число от 0 до 10):"
 		return check_throw(raw_input())
-	throw = int(throw)
+	
 	if throw > 10 or throw < 0:
 		print u"Вы не могли сбить столько кеглей."
 		print u"Бросьте шар(введите число от 0 до 10):"
 		return check_throw(raw_input())
 	else:
 		return throw
-			 
+		
+def throw_one():
+	print u"Бросьте шар(введите число от 0 до 10):"
+	throw = check_throw(raw_input())
+	return throw
+				 
 def throw_two(throw):
 	left = 10 - throw
-	print u"Осталось кеглей: ", str(left)
+	print u"Осталось кеглей: %s" % left
 	total = throw
-	print u'Бросьте шар ещё раз(Введите число от 0 до ' + str(left)+' ): '
-	throw = raw_input()
+	print u'Бросьте шар ещё раз(Введите число от 0 до %s ): ' % left
+	
 	try:
-		throw = int(throw)
+		throw = int(raw_input())
 	except(TypeError, ValueError):
 		print u"Данные были введены некорректно"
 		return throw_two(total)
@@ -45,13 +57,19 @@ def throw_two(throw):
 		print u"Вы не могли сбить столько кеглей."
 		return throw_two(total)
 	else:
-		total = total+throw
+		total += throw
 		print u"Всего сбито:", str(total)
 		return total
-
-	print u"Всего сбито: ", str(total)
-	return total
-
+		
+def throw_two2():
+	print u'Бросьте шар ещё раз(Введите число от 0 до 10 ): '
+	try:
+		throw = int(raw_input())
+	except(TypeError, ValueError):
+		print u"Данные были введены некорректно"
+		return throw_two2()
+	return throw
+			
 def happening(throw):
 	if throw < 10:
 		throw = throw_two(throw)
@@ -59,68 +77,46 @@ def happening(throw):
 			return throw
 		else:
 			return "/"
-	else:
-		return "X"
+	return "X"
 		
 def happening_2(count_point):
-	n = len(count_point)-1
+	last_ind = len(count_point)-1
 	if count_point[n] == "X":
-		while True:
-			print u'Бросьте шар ещё раз(Введите число от 0 до ' + str(left)+' ): '
-			throw = raw_input()
-			try:
-				throw = int(throw)
-				break
-			except(TypeError, ValueError):
-				print u"Данные были введены некорректно"
-		throw = int(throw)
-		if count_point[n-1] == "X":
-			count_point[n-1] = 20 + throw
-		count_point[n] = 10 + throw 
+		throw = throw_two2()
+		if count_point[last_ind-1] == "X":
+			count_point[last_ind-1] = 20 + throw
+		count_point[last_ind] = 10 + throw 
 		if throw == 10:
-			print u"Бросьте шар ещё раз(введите число от 0 до 10): "
-			throw = input()
-			count_point[n] += throw
+			throw = throw_two2()
+			count_point[last_ind] += throw
 		else:
 			throw = throw_two(throw)
-			count_point[n] = 10 + throw
+			count_point[last_ind] = 10 + throw
 
-	elif count_point[n] == "/":
-		while True:
-			print u'Бросьте шар ещё раз(Введите число от 0 до ' + str(left)+' ): '
-			throw = raw_input()
-			try:
-				throw = int(throw)
-				break
-			except(TypeError, ValueError):
-				print u"Данные были введены некорректно"
-		throw = int(throw)
-		count_point[n] = 10 +throw 
+	elif count_point[last_ind] == "/":
+		throw = throw_two2()
+		count_point[last_ind] = 10 +throw 
 	return count_point			
 
 def sample_throw(count_point):
-	print u"Бросьте шар(введите число от 0 до 10):"
-	throw = check_throw(raw_input())
-	count_point.append(happening(throw))
+	count_point.append(happening(throw_one()))
 	return count_point		
 
 def doubel_throw(count_point):
-	n = len(count_point) - 1
-	print u"Бросьте шар(введите число от 0 до 10):"
-	throw = check_throw(input())
-	count_point[n] = 10 + throw
+	last_ind = len(count_point) - 1
+	throw = throw_one()
+	count_point[last_ind] = 10 + throw
 	count_point.append(happening(throw))
 	return count_point
 
 def triple_throw(count_point):
-	n = len(count_point) - 1
-	print u"Бросьте шар(введите число от 0 до 10):"
-	throw = check_throw(raw_input())
-	if count_point[n-1] == "X":
-		count_point[n-1] = 20 + throw
+	last_ind = len(count_point) - 1
+	throw = throw_one()
+	if count_point[last_ind-1] == "X" and last_ind > 0:
+		count_point[last_ind-1] = 20 + throw
 	if throw < 10:
 		throw = throw_two(throw)
-		count_point[n] = 10 + throw
+		count_point[last_ind] = 10 + throw
 		if throw < 10:
 			count_point.append(throw)
 			return count_point
@@ -139,52 +135,52 @@ print u'Какое количество игроков(Максимум 5): '
 count_player = check_players(raw_input())
 
 for i in range(count_player):
-	print u"Имя игрока № " + str(i+1) + ": "
-	name = raw_input()
+	print u"Имя игрока №: %s" % (i+1) 
+	name = check_name(raw_input())
 	statistic[name] = []
 	
 for i in range(9):
 	for key in statistic:
-		print key,u"ваша очередь бросать шар."
+		print u"%s ваша очередь бросать шар." % key
 		count_point = statistic[key]
-		n = len(count_point)-1
+		last_ind = len(count_point)-1
 		if len(count_point) == 0:
 			count_point = sample_throw(count_point)
 			print key+":", statistic[key]
 		else:
-			if count_point[n] == "/":
+			if count_point[last_ind] == "/":
 				count_point = doubel_throw(count_point)
-			elif count_point[n] == "X":
+			elif count_point[last_ind] == "X":
 				count_point = triple_throw(count_point)
 			else:
 				count_point = sample_throw(count_point)
 			statistic[key] = count_point
-			print key+":", statistic[key]
+			print "%s : %s" % (key, statistic[key])
 			
-n = len(count_point)-1
+last_ind = len(count_point)-1
 
 for key in statistic:
-	print key,u"ваша очередь бросать шар."
+	print u"%s ваша очередь бросать шар." % key
 	count_point = statistic[key]
 	n = len(count_point)-1
-	if count_point[n] == "/":
+	if count_point[last_ind] == "/":
 		count_point = doubel_throw(count_point)
 		count_point = happening_2(count_point)
-	elif count_point[n] == "X":
+	elif count_point[last_ind] == "X":
 		count_point = triple_throw(count_point)
 		count_point = happening_2(count_point)
 	else:
 		count_point = sample_throw(count_point)
 		count_point = happening_2(count_point)
 	statistic[key] = count_point
-	print key+":", statistic[key]
+	print "%s : %s" % (key, statistic[key])
 
 sum_resuld = []
 	
 for key in statistic:
 	total = sum(statistic[key])
 	sum_resuld.append(total)
-	print key+":", statistic[key] , "Total: ", total
+	print "%s: %s Total: %s" % (key, statistic[key], total)
 	
 winner = max(sum_resuld)
 
